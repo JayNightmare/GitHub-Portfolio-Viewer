@@ -9,6 +9,44 @@ const projectsList = document.getElementById('projects-list');
 const orgsList = document.getElementById('orgs-list');
 
 let currentSelectedLanguage = null;
+let allRepos = [];
+
+// Search functionality
+const searchRepos = (query) => {
+  const searchTerm = query.toLowerCase();
+  
+  if (!searchTerm) {
+    // If search is empty, show repos for current selected language
+    renderReposForLanguage(currentSelectedLanguage);
+    return;
+  }
+
+  // Search through all repos
+  const filteredRepos = allRepos.filter(repo => 
+    repo.name.toLowerCase().includes(searchTerm) ||
+    (repo.description && repo.description.toLowerCase().includes(searchTerm))
+  );
+
+  // Clear current display
+  projectsList.innerHTML = '';
+
+  // Show filtered results
+  filteredRepos.forEach(repo => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${repo.name}</h3>
+      <p>${repo.description ? repo.description : 'No description provided.'}</p>
+      <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    `;
+    projectsList.appendChild(card);
+  });
+};
+
+// Add search event listener
+document.getElementById('repo-search').addEventListener('input', (e) => {
+  searchRepos(e.target.value);
+});
 
 // Group repos by language
 function groupReposByLanguage(repos) {
@@ -63,7 +101,10 @@ function updateSelectedFolder() {
 function renderReposForLanguage(language) {
   projectsList.innerHTML = '';
   if (!language) return;
-  const repos = groupedRepos[language] || [];
+  
+  // Filter repos by selected language
+  const repos = allRepos.filter(repo => (repo.language || 'Unknown') === language);
+  
   repos.forEach(repo => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -84,7 +125,10 @@ async function fetchUserRepos() {
     if (!response.ok) throw new Error('Failed to fetch repositories');
     const repos = await response.json();
 
-    groupedRepos = groupReposByLanguage(repos);
+    // Store all repos for search functionality
+    allRepos = repos;
+
+    const groupedRepos = groupReposByLanguage(repos);
     const languages = Object.keys(groupedRepos).sort();
 
     renderFolderList(languages);

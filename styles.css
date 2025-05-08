@@ -31,7 +31,7 @@ body {
 
 /* Pink Theme */
 body.pink-theme {
-  --primary-color: #ff6f91;
+  --primary-color: #000;
   --secondary-color: #ff9a9e;
   --tertiary-color: #ffc3a0;
   --background-gradient-start: #ffe5ec;
@@ -49,7 +49,7 @@ body.dark-theme {
   --secondary-color: #888888;
   --tertiary-color: #444444;
   --background-gradient-start: #000000;
-  --background-gradient-end: #222222;
+  --background-gradient-end: #333333;
   --text-color: #ffffff;
   --card-background: #222222;
   --card-hover-shadow: rgba(255, 255, 255, 0.6);
@@ -58,31 +58,17 @@ body.dark-theme {
 }
 
 /* Light Mode Theme */
-/* body.light-theme {
-  --primary-color: #007acc;
-  --secondary-color: #e0e0e0;
-  --tertiary-color: #f5f5f5;
-  --background-gradient-start: #ffffff;
-  --background-gradient-end: #e0e0e0;
-  --text-color: #222222;
-  --card-background: #f5f5f5;
-  --card-hover-shadow: rgba(0, 122, 204, 0.3);
-  --link-color: #007acc;
-  --link-hover-color: #005a9e;
-} */
-
-/* Light Mode Theme */
 body.light-theme {
-  --primary-color:            #4F46E5;                /* your signature indigo */
-  --secondary-color:          #E5E7EB;                /* light border/separator gray */
-  --tertiary-color:           #F9FAFB;                /* card & panel background */
-  --background-gradient-start:#FFFFFF;                /* pure white page bg */
-  --background-gradient-end:  #F9FAFB;                /* super-light gray fade */
-  --text-color:               #1F2937;                /* dark-gray for max readability */
-  --card-background:          #F9FAFB;                /* same as tertiary for consistency */
-  --card-hover-shadow:        rgba(79, 70, 229, 0.3); /* soft indigo glow on hover */
-  --link-color:               #4F46E5;                /* match primary for links/buttons */
-  --link-hover-color:         #4338CA;                /* deeper indigo on hover */
+  --primary-color: #4F46E5;
+  --secondary-color: #E5E7EB;
+  --tertiary-color: #F9FAFB;
+  --background-gradient-start: #FFFFFF;
+  --background-gradient-end: #F9FAFB;
+  --text-color: #1F2937;
+  --card-background: #F9FAFB;
+  --card-hover-shadow: rgba(79, 70, 229, 0.3);
+  --link-color: #4F46E5;
+  --link-hover-color: #4338CA;
 }
 
 header {
@@ -90,6 +76,11 @@ header {
   margin-bottom: 2rem;
   animation: fadeInDown 1s ease forwards;
   color: var(--primary-color);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
 
 h1 {
@@ -110,69 +101,6 @@ h2 {
 p {
   font-size: 1.2rem;
   color: var(--text-color);
-}
-
-.card-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  width: 100%;
-  max-width: 1000px;
-}
-
-.card {
-  background: #2a2a40;
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(97, 218, 251, 0.3);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 10px 30px rgba(97, 218, 251, 0.6);
-}
-
-.card h3 {
-  margin-bottom: 0.75rem;
-  color: #61dafb;
-}
-
-.card p {
-  font-size: 1rem;
-  color: #ddd;
-  margin-bottom: 1rem;
-  min-height: 3rem;
-}
-
-.card a {
-  color: #61dafb;
-  text-decoration: none;
-  font-weight: bold;
-  position: relative;
-  z-index: 1;
-}
-
-.card a::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background: #61dafb;
-  left: 0;
-  bottom: -2px;
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-  transform-origin: right;
-  z-index: 0;
-}
-
-.card a:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
 }
 
 /* Animations */
@@ -196,6 +124,35 @@ footer {
   max-width: 1000px;
 }
 
+/* Search bar styles */
+#search-container {
+  margin: 1rem 0;
+  width: 100%;
+  max-width: 400px;
+}
+
+#repo-search {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 20px;
+  background: var(--tertiary-color);
+  color: var(--text-color);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+#repo-search:focus {
+  outline: none;
+  box-shadow: 0 0 10px var(--primary-color);
+  background: var(--card-background);
+}
+
+#repo-search::placeholder {
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
 /* VSCode-like layout */
 #container {
   display: flex;
@@ -203,7 +160,8 @@ footer {
   max-width: 1200px;
   width: 1200px;
   margin: 0 auto;
-  background: #1e1e2f;
+  /* background: #1e1e2f; */
+  background: linear-gradient(135deg, var(--background-gradient-end), var(--background-gradient-start));
   border-radius: 8px;
   box-shadow: 0 0 20px var(--card-hover-shadow);
   overflow: hidden;
@@ -212,7 +170,7 @@ footer {
 
 #sidebar {
   width: 250px;
-  background: #252535;
+  /* background: #252535; */
   color: #ccc;
   display: flex;
   flex-direction: column;
@@ -302,13 +260,13 @@ footer {
   border-radius: 4px;
   display: flex;
   align-items: center;
-  color: #ccc;
+  color: var(--text-color);
   user-select: none;
   transition: background-color 0.3s ease;
 }
 
 #folder-list li:hover {
-  background-color: #3a3a5a;
+  background-color: var(--card-background);
 }
 
 #folder-list li.selected {
@@ -327,7 +285,8 @@ footer {
   flex-grow: 1;
   padding: 1.5rem;
   overflow-y: auto;
-  background: #2a2a40;
+  /* background: #2a2a40; */
+  /* background: linear-gradient(135deg, var(--background-gradient-start), var(--background-gradient-end)); */
   color: #f0f0f0;
   display: flex;
   flex-direction: column;
