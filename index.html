@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JayNightmare Portfolio</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>JayNightmare Portfolio</h1>
+    <p>Showcasing my GitHub projects and organizations</p>
+    <div id="theme-selector-container">
+      <label for="theme-selector">Theme: </label>
+      <select id="theme-selector" aria-label="Select Theme">
+        <option value="default">Default</option>
+        <option value="pink">Pink</option>
+        <option value="dark">Dark Mode</option>
+        <option value="light">Light Mode</option>
+      </select>
+    </div>
+  </header>
+
+  <div id="container">
+    <aside id="sidebar">
+      <h2>Languages</h2>
+      <ul id="folder-list">
+        <!-- Folder list will be rendered here -->
+      </ul>
+    </aside>
+
+    <main id="main-content">
+      <section id="projects">
+        <h2>Projects</h2>
+        <div id="projects-list" class="card-container">
+          <!-- Repos for selected folder will be shown here -->
+        </div>
+      </section>
+
+      <section id="organizations">
+        <h2>My Organizations</h2>
+        <div id="orgs-list" class="card-container">
+          <!-- Organizations will be loaded here -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    <p>© 2024 JayNightmare</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
