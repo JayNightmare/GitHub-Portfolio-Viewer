@@ -7,18 +7,23 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div id="theme-selector-container">
+    <div class="theme-buttons">
+      <button class="theme-btn selected" data-theme="default">
+        <img src="./images/clouds-sun.svg" alt="Default mode" width="24" />
+      </button>
+      <button title="dark-mode" class="theme-btn" data-theme="dark">
+        <img src="./images/moon-stars.svg" alt="Dark mode" width="24" />
+      </button>
+      <button title="light-mode" class="theme-btn" data-theme="light">
+        <img src="./images/brightness.svg" alt="Light mode" width="24" />
+      </button>
+    </div>
+  </div>
+
   <header>
     <h1>JayNightmare Portfolio</h1>
     <p>Showcasing my GitHub projects and organizations</p>
-    <div id="theme-selector-container">
-      <label for="theme-selector">Theme: </label>
-      <select id="theme-selector" aria-label="Select Theme">
-        <option value="default">Default</option>
-        <option value="pink">Pink</option>
-        <option value="dark">Dark Mode</option>
-        <option value="light">Light Mode</option>
-      </select>
-    </div>
     <div id="search-container">
       <input type="search" id="repo-search" placeholder="Search repositories..." aria-label="Search repositories">
     </div>

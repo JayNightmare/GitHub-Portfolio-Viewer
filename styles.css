@@ -6,16 +6,16 @@
 }
 
 :root {
-  --primary-color: #61dafb;
-  --secondary-color: #3a3a5a;
-  --tertiary-color: #2a2a40;
-  --background-gradient-start: #1e1e2f;
-  --background-gradient-end: #3a3a5a;
+  --primary-color: #E0AAFF;
+  --secondary-color: #240046;
+  --tertiary-color: #3C096C;
+  --background-gradient-start: #10002B;
+  --background-gradient-end: #240046;
   --text-color: #f0f0f0;
-  --card-background: #2a2a40;
-  --card-hover-shadow: rgba(97, 218, 251, 0.6);
-  --link-color: #61dafb;
-  --link-hover-color: #61dafb;
+  --card-background: #3C096C;
+  --card-hover-shadow: #9D4EDD;
+  --link-color: #C77DFF;
+  --link-hover-color: #C77DFF;
 }
 
 body {
@@ -27,20 +27,6 @@ body {
   flex-direction: column;
   align-items: center;
   padding: 2rem;
-}
-
-/* Pink Theme */
-body.pink-theme {
-  --primary-color: #000;
-  --secondary-color: #ff9a9e;
-  --tertiary-color: #ffc3a0;
-  --background-gradient-start: #ffe5ec;
-  --background-gradient-end: #ff6f91;
-  --text-color: #3a003a;
-  --card-background: #ffc3a0;
-  --card-hover-shadow: rgba(255, 111, 145, 0.6);
-  --link-color: #ff6f91;
-  --link-hover-color: #ff9a9e;
 }
 
 /* Dark Mode Theme (Black and White Monochrome) */
@@ -244,6 +230,7 @@ footer {
   font-weight: bold;
   margin-bottom: 1rem;
   font-size: 1.5rem;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -261,6 +248,7 @@ footer {
   display: flex;
   align-items: center;
   color: var(--text-color);
+  -webkit-user-select: none;
   user-select: none;
   transition: background-color 0.3s ease;
 }
@@ -278,6 +266,7 @@ footer {
 .folder-icon {
   margin-right: 0.75rem;
   font-size: 1.2rem;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -295,6 +284,7 @@ footer {
 #projects h2, #organizations h2 {
   /* color: #61dafb; */
   margin-bottom: 1rem;
+  -webkit-user-select: none;
   user-select: none;
 }
 
@@ -376,6 +366,7 @@ footer {
   align-items: center;
   padding: 1rem 1.5rem;
   cursor: pointer;
+  -webkit-user-select: none;
   user-select: none;
   color: #61dafb;
   font-weight: bold;
@@ -410,4 +401,39 @@ footer {
 .folder-content.open {
   padding: 1rem 1.5rem;
   max-height: 1000px; /* large enough to show content */
+}
+
+#theme-selector-container {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: var(--text-color);
+}
+
+.theme-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.theme-btn {
+  background: #E0AAFF;
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  display: flex;
+  align-items: center;
+}
+
+.theme-btn:hover {
+  background: var(--secondary-color);
+  color: var(--text-color);
+}
+
+.theme-btn svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }

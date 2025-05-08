@@ -165,26 +165,15 @@ function init() {
 document.addEventListener('DOMContentLoaded', () => {
   init();
 
-  const themeSelector = document.getElementById('theme-selector');
+  const themeButtons = document.querySelectorAll('.theme-btn');
 
   function applyTheme(theme) {
     document.body.classList.remove('pink-theme', 'dark-theme', 'light-theme');
-    const headings = document.querySelectorAll('h1, h2');
-    headings.forEach(heading => {
-      heading.classList.remove('pink-theme', 'dark-theme', 'light-theme');
-    });
-
-    if (theme === 'pink') {
-      document.body.classList.add('pink-theme');
-      headings.forEach(heading => heading.classList.add('pink-theme'));
-    } else if (theme === 'dark') {
+    if (theme === 'dark') {
       document.body.classList.add('dark-theme');
-      headings.forEach(heading => heading.classList.add('dark-theme'));
     } else if (theme === 'light') {
       document.body.classList.add('light-theme');
-      headings.forEach(heading => heading.classList.add('light-theme'));
     } else {
-      // Default theme: remove inline styles
       document.body.classList.remove('pink-theme', 'dark-theme', 'light-theme');
       document.body.style.removeProperty('--primary-color');
       document.body.style.removeProperty('--secondary-color');
@@ -199,10 +188,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  themeSelector.addEventListener('change', (e) => {
-    applyTheme(e.target.value);
+  themeButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      themeButtons.forEach(btn => btn.classList.remove('selected'));
+      button.classList.add('selected');
+      applyTheme(button.getAttribute('data-theme'));
+    });
   });
 
   // Apply default theme on load
-  applyTheme(themeSelector.value);
+  const defaultButton = document.querySelector('.theme-btn.selected');
+  if (defaultButton) {
+    applyTheme(defaultButton.getAttribute('data-theme'));
+  }
 });
