@@ -148,22 +148,65 @@ footer {
   margin: 0 auto;
   /* background: #1e1e2f; */
   background: linear-gradient(135deg, var(--background-gradient-end), var(--background-gradient-start));
-  border-radius: 8px;
-  box-shadow: 0 0 20px var(--card-hover-shadow);
+  border-radius: 0px 0px 8px 8px;
+  border: 1px solid var(--primary-color);
+  z-index: 1;
+  /* box-shadow: 0 0 20px var(--card-hover-shadow); */
   overflow: hidden;
   flex-wrap: nowrap;
 }
 
-#sidebar {
+#sidebar,
+.sidebar {
   width: 250px;
-  /* background: #252535; */
   color: #ccc;
   display: flex;
   flex-direction: column;
   padding: 1rem;
-  border-right: 1px solid #3a3a5a;
+  border-right: 1px solid var(--primary-color);
   overflow-y: auto;
   flex-shrink: 0;
+}
+
+#sidebar h2,
+.sidebar h2 {
+  font-weight: bold;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#folder-list,
+.folder-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+#folder-list li,
+.folder-list li {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  color: var(--text-color);
+  -webkit-user-select: none;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+#folder-list li:hover,
+.folder-list li:hover {
+  background-color: var(--card-background);
+}
+
+#folder-list li.selected,
+.folder-list li.selected {
+  background-color: var(--primary-color);
+  color: var(--background-gradient-start);
 }
 
 /* Responsive styles */
@@ -225,44 +268,6 @@ footer {
   }
 }
 
-#sidebar h2 {
-  /* color: #61dafb; */
-  font-weight: bold;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-#folder-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  flex-grow: 1;
-}
-
-#folder-list li {
-  padding: 0.5rem 1rem;
-  cursor: pointer;
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  color: var(--text-color);
-  -webkit-user-select: none;
-  user-select: none;
-  transition: background-color 0.3s ease;
-}
-
-#folder-list li:hover {
-  background-color: var(--card-background);
-}
-
-#folder-list li.selected {
-  background-color: #61dafb;
-  color: #1e1e2f;
-  font-weight: bold;
-}
-
 .folder-icon {
   margin-right: 0.75rem;
   font-size: 1.2rem;
@@ -270,19 +275,142 @@ footer {
   user-select: none;
 }
 
-#main-content {
+#main-content,
+.main-content {
   flex-grow: 1;
   padding: 1.5rem;
   overflow-y: auto;
-  /* background: #2a2a40; */
-  /* background: linear-gradient(135deg, var(--background-gradient-start), var(--background-gradient-end)); */
   color: #f0f0f0;
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+#app-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Browser Tab Styles */
+.browser-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-radius: 8px 8px 0 0;
+  margin-bottom: -1px;
+  padding: 0 0.5rem;
+  flex-wrap: wrap;
+}
+
+.browser-tab {
+  background: var(--card-background);
+  border: none;
+  color: var(--text-color);
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 8px 8px 0 0;
+  border: 1px solid transparent;
+  border-bottom: 1px solid var(--primary-color);
+  min-width: 150px;
+  max-width: 200px;
+
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.browser-tab svg {
+  fill: var(--text-color);
+  flex-shrink: 0;
+}
+
+.browser-tab span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-grow: 1;
+  text-align: left;
+}
+
+.browser-tab .close-btn {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  padding: 4px;
+  margin-left: 4px;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0.7;
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.browser-tab .close-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  opacity: 1;
+}
+
+.browser-tab:hover {
+  opacity: 1;
+  background: var(--tertiary-color);
+}
+
+.browser-tab.active {
+  background: var(--background-gradient-end);
+  opacity: 1;
+  border: 1px solid var(--primary-color);
+  border-bottom: 1px solid var(--background-gradient-end);
+}
+
+/* Ensure first two tabs (Personal and Organizations) don't show close button */
+.browser-tab[data-view="personal"] .close-btn,
+.browser-tab[data-view="organizations"] .close-btn {
+  display: none;
+}
+
+/* Browser View Styles */
+.browser-view {
+  display: none;
+  height: 100%;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Initial active view */
+#personal-view.active {
+  display: flex;
+}
+
+#personal-view {
+  width: 100%;
+}
+
+#organizations-view {
+  width: 100%;
+}
+
+#orgs-content {
+  flex-grow: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 #projects h2, #organizations h2 {
-  /* color: #61dafb; */
   margin-bottom: 1rem;
   -webkit-user-select: none;
   user-select: none;
@@ -356,7 +484,6 @@ footer {
 .folder {
   background: #2a2a40;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(97, 218, 251, 0.3);
   overflow: hidden;
   transition: box-shadow 0.3s ease;
 }
@@ -368,10 +495,8 @@ footer {
   cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
-  color: #61dafb;
   font-weight: bold;
   font-size: 1.25rem;
-  border-bottom: 1px solid #61dafb;
   background: #1f1f33;
   transition: background-color 0.3s ease;
 }
@@ -436,4 +561,49 @@ footer {
 .theme-btn svg {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+/* Organization View Styles */
+.org-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.back-btn {
+  background: var(--card-background);
+  color: var(--text-color);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.back-btn:hover {
+  background: var(--primary-color);
+  color: var(--background-gradient-start);
+}
+
+.view-org-btn {
+  background: var(--primary-color);
+  color: var(--background-gradient-start);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-top: 1rem;
+}
+
+.view-org-btn:hover {
+  background: var(--card-background);
+  color: var(--text-color);
+}
+
+#org-repos-list {
+  animation: fadeIn 0.3s ease forwards;
 }
