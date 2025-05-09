@@ -168,7 +168,6 @@ footer {
 
 /* VSCode-like layout */
 #container {
-  display: flex;
   height: calc(100vh - 140px);
   max-width: 1200px;
   width: 1200px;
@@ -245,26 +244,30 @@ footer {
 }
 
 @media (max-width: 768px) {
+  header {
+    margin-top: 50px;
+  }
+
   #container {
     flex-direction: column;
     height: auto;
     max-width: 100%;
-    border-radius: 0;
     box-shadow: none;
   }
 
   #sidebar {
-    width: 100%;
     height: auto;
     border-right: none;
-    border-bottom: 1px solid #3a3a5a;
+    border-bottom: 1px solid var(--primary-color);
     padding: 0.5rem 1rem;
     overflow-x: auto;
     flex-shrink: 0;
+    width: 100%;
   }
 
   #folder-list {
     display: flex;
+    flex-direction: row;
     flex-wrap: nowrap;
     overflow-x: auto;
   }
@@ -275,6 +278,10 @@ footer {
     border-radius: 4px;
   }
 
+  #personal-view {
+    flex-direction: column;
+  }
+
   #main-content {
     padding: 1rem;
     height: auto;
@@ -282,6 +289,11 @@ footer {
 
   .card-container {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  .user-header {
+    flex-direction: column;
+    text-align: center;
   }
 }
 

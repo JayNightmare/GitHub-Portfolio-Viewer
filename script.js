@@ -429,44 +429,118 @@ async function fetchUserProfile(username) {
 let currentUserRepos = [];
 let currentUserOrgs = [];
 
+function createUserProfileTab(userData) {
+  const tabsContainer = document.getElementById('browser-tabs');
+  const container = document.getElementById('container');
+  
+  // Create new tab
+  const tab = document.createElement('button');
+  tab.className = 'browser-tab';
+  tab.setAttribute('data-view', `user-${userData.login}`);
+  tab.innerHTML = `
+    <img src="${userData.avatar_url}" alt="${userData.login}" style="width: 16px; height: 16px; border-radius: 50%;">
+    <span>${userData.login}</span>
+    <button class="close-btn" title="Close tab">×</button>
+  `;
+
+  // Create new view
+  const view = document.createElement('div');
+  view.id = `user-${userData.login}-view`;
+  view.className = 'browser-view';
+  view.innerHTML = `
+    <main class="main-content">
+      <div class="user-header">
+        <img src="${userData.avatar_url}" alt="${userData.login}" class="user-avatar">
+        <div class="user-info">
+          <h2>${userData.name || userData.login}</h2>
+          <p>${userData.bio || ''}</p>
+          <div class="user-stats">
+            <div class="stat">
+              <span class="stat-value">${userData.public_repos}</span>
+              <span class="stat-label">Repositories</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">${userData.followers}</span>
+              <span class="stat-label">Followers</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">${userData.following}</span>
+              <span class="stat-label">Following</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tabs">
+        <button class="tab active" data-tab="repos">Repositories</button>
+        <button class="tab" data-tab="orgs">Organizations</button>
+      </div>
+      <div id="user-${userData.login}-repos" class="tab-content active card-container"></div>
+      <div id="user-${userData.login}-orgs" class="tab-content card-container"></div>
+    </main>
+  `;
+
+  // Add tab and view to DOM
+  tabsContainer.appendChild(tab);
+  container.appendChild(view);
+
+  // Add tab switching functionality
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.browser-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.browser-view').forEach(v => {
+      v.classList.remove('active');
+      v.style.display = 'none';
+    });
+    tab.classList.add('active');
+    view.classList.add('active');
+    view.style.display = 'flex';
+  });
+
+  // Add close button functionality
+  tab.querySelector('.close-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    view.remove();
+    tab.remove();
+    
+    // Switch to user search view if no other user tabs are open
+    const remainingUserTabs = document.querySelectorAll('.browser-tab[data-view^="user-"]');
+    if (remainingUserTabs.length === 0) {
+      document.querySelector('.browser-tab[data-view="user-search"]').click();
+    } else {
+      remainingUserTabs[remainingUserTabs.length - 1].click();
+    }
+  });
+
+  // Add tab functionality for repos/orgs
+  view.querySelectorAll('.tab').forEach(tabBtn => {
+    tabBtn.addEventListener('click', () => {
+      view.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      view.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tabBtn.classList.add('active');
+      const contentId = `user-${userData.login}-${tabBtn.dataset.tab}`;
+      document.getElementById(contentId).classList.add('active');
+    });
+  });
+
+  return { tab, view };
+}
+
 function displayUserProfile(userData, repos, orgs) {
   // Store repos and orgs for search functionality
   currentUserRepos = repos;
   currentUserOrgs = orgs;
-  const userProfile = document.getElementById('user-profile');
-  const searchResults = document.getElementById('search-results');
-  const userHeader = document.querySelector('.user-header');
 
-  // Hide search results and show profile
-  searchResults.style.display = 'none';
-  userProfile.style.display = 'block';
+  // Check if tab already exists
+  const existingTab = document.querySelector(`.browser-tab[data-view="user-${userData.login}"]`);
+  if (existingTab) {
+    existingTab.click();
+    return;
+  }
 
-  // Update profile header
-  userHeader.innerHTML = `
-    <img src="${userData.avatar_url}" alt="${userData.login}" class="user-avatar">
-    <div class="user-info">
-      <h2>${userData.name || userData.login}</h2>
-      <p>${userData.bio || ''}</p>
-      <div class="user-stats">
-        <div class="stat">
-          <span class="stat-value">${userData.public_repos}</span>
-          <span class="stat-label">Repositories</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">${userData.followers}</span>
-          <span class="stat-label">Followers</span>
-        </div>
-        <div class="stat">
-          <span class="stat-value">${userData.following}</span>
-          <span class="stat-label">Following</span>
-        </div>
-      </div>
-    </div>
-  `;
+  // Create new tab and view
+  const { tab, view } = createUserProfileTab(userData);
 
   // Display repos
-  const userRepos = document.getElementById('user-repos');
-  userRepos.innerHTML = '';
+  const userRepos = view.querySelector(`#user-${userData.login}-repos`);
   repos.forEach(repo => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -479,8 +553,7 @@ function displayUserProfile(userData, repos, orgs) {
   });
 
   // Display orgs
-  const userOrgs = document.getElementById('user-orgs');
-  userOrgs.innerHTML = '';
+  const userOrgs = view.querySelector(`#user-${userData.login}-orgs`);
   orgs.forEach(org => {
     const card = document.createElement('div');
     card.className = 'card';
@@ -493,6 +566,9 @@ function displayUserProfile(userData, repos, orgs) {
     `;
     userOrgs.appendChild(card);
   });
+
+  // Activate the new tab
+  tab.click();
 }
 
 function initUserSearch() {
@@ -515,7 +591,7 @@ function initUserSearch() {
 
     // Show search results and hide profile
     searchResults.style.display = 'grid';
-    userProfile.style.display = 'none';
+    // userProfile.style.display = 'none';
 
     searchTimeout = setTimeout(async () => {
       const { items } = await searchGitHubUsers(query);
