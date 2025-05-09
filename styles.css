@@ -3,6 +3,33 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary-color) var(--card-background);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card-background);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--link-color);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--card-background);
 }
 
 :root {
@@ -403,11 +430,7 @@ li.selected .folder-svg {
   display: flex;
 }
 
-#personal-view {
-  width: 100%;
-}
-
-#organizations-view {
+#personal-view, #organizations-view, #user-search-view {
   width: 100%;
 }
 
@@ -580,6 +603,137 @@ li.selected .folder-svg {
 }
 
 /* Organization View Styles */
+/* User Search Styles */
+.search-container {
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#github-user-search {
+  width: 100%;
+  padding: 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  background: var(--tertiary-color);
+  color: var(--text-color);
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+#github-user-search:focus {
+  outline: none;
+  box-shadow: 0 0 15px var(--primary-color);
+  background: var(--card-background);
+}
+
+.user-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 2rem;
+  background: var(--card-background);
+  border-radius: 8px;
+}
+
+.user-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  border: 3px solid var(--primary-color);
+}
+
+.user-info {
+  flex-grow: 1;
+}
+
+.user-info h2 {
+  margin-bottom: 0.5rem;
+}
+
+.user-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: var(--text-color);
+}
+
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--card-background);
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.tab::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--primary-color);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.tab:hover {
+  color: var(--primary-color);
+}
+
+.tab.active {
+  color: var(--primary-color);
+}
+
+.tab.active::after {
+  transform: scaleX(1);
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+#user-repos.tab-content.active, #user-orgs.tab-content.active {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
 .org-header {
   display: flex;
   align-items: center;
@@ -605,6 +759,26 @@ li.selected .folder-svg {
 
 .view-org-btn {
   background: var(--primary-color);
+  fill: var(--tertiary-color);
+  border: none;
+  padding: 0.75rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin-top: 1rem;
+
+  display: flex;
+  align-items: center;
+  
+}
+
+.view-org-btn:hover {
+  background: var(--card-hover-shadow);
+}
+
+.view-profile-btn {
+  background: var(--primary-color);
   color: var(--background-gradient-start);
   border: none;
   padding: 0.5rem 1rem;
@@ -613,13 +787,38 @@ li.selected .folder-svg {
   transition: all 0.3s ease;
   font-size: 1rem;
   margin-top: 1rem;
+  width: 100%;
 }
 
-.view-org-btn:hover {
+.view-profile-btn:hover {
   background: var(--card-background);
   color: var(--text-color);
 }
 
 #org-repos-list {
   animation: fadeIn 0.3s ease forwards;
+}
+
+#user-orgs .card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+#orgs-list .card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  .left-side {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  button {
+    margin: 0;
+  }
 }

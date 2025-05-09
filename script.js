@@ -1,7 +1,19 @@
+// Helper function to render repository cards
+const renderRepoCard = (repo, container) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <h3>${repo.name}</h3>
+    <p>${repo.description || 'No description provided.'}</p>
+    <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+  `;
+  container.appendChild(card);
+};
+
 const username = 'JayNightmare';
 const orgs = [
   { name: 'Nexus-Scripture', url: 'https://github.com/Nexus-Scripture' },
-  { name: 'Augmented Perception', url: 'https://github.com/Augmented-Perception' },
+  { name: 'Augmented-Perception', url: 'https://github.com/Augmented-Perception' },
 ];
 
 const folderList = document.getElementById('folder-list');
@@ -11,42 +23,38 @@ const orgsList = document.getElementById('orgs-list');
 let currentSelectedLanguage = null;
 let allRepos = [];
 
-// Search functionality
-const searchRepos = (query) => {
-  const searchTerm = query.toLowerCase();
-  
-  if (!searchTerm) {
-    // If search is empty, show repos for current selected language
-    renderReposForLanguage(currentSelectedLanguage);
+// Enhanced search functionality
+const searchRepos = (query, repos, container) => {
+  // Clear container first
+  container.innerHTML = '';
+
+  // Handle empty repos array
+  if (!repos || repos.length === 0) {
+    container.innerHTML = '<p>No repositories available.</p>';
     return;
   }
 
-  // Search through all repos
-  const filteredRepos = allRepos.filter(repo => 
+  const searchTerm = query.toLowerCase().trim();
+  
+  // If search is empty, show all repos
+  if (!searchTerm) {
+    repos.forEach(repo => renderRepoCard(repo, container));
+    return;
+  }
+
+  // Filter repos based on search term
+  const filteredRepos = repos.filter(repo => 
     repo.name.toLowerCase().includes(searchTerm) ||
     (repo.description && repo.description.toLowerCase().includes(searchTerm))
   );
+  
+  if (filteredRepos.length === 0) {
+    container.innerHTML = `<p>No repositories found matching "${query}"</p>`;
+    return;
+  }
 
-  // Clear current display
-  projectsList.innerHTML = '';
-
-  // Show filtered results
-  filteredRepos.forEach(repo => {
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.innerHTML = `
-      <h3>${repo.name}</h3>
-      <p>${repo.description ? repo.description : 'No description provided.'}</p>
-      <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-    `;
-    projectsList.appendChild(card);
-  });
+  filteredRepos.forEach(repo => renderRepoCard(repo, container));
 };
-
-// Add search event listener
-document.getElementById('repo-search').addEventListener('input', (e) => {
-  searchRepos(e.target.value);
-});
 
 // Group repos by language
 function groupReposByLanguage(repos) {
@@ -320,14 +328,32 @@ async function displayOrgRepos(orgName) {
   });
 }
 
-function displayOrgs() {
+async function displayOrgs() {
   orgsList.innerHTML = '';
-  orgs.forEach(org => {
+  for (const org of orgs) {
+    // Fetch org details to get avatar_url
+    let avatarUrl = '';
+    try {
+      const response = await fetch(`https://api.github.com/orgs/${org.name}`);
+      if (response.ok) {
+        const orgData = await response.json();
+        avatarUrl = orgData.avatar_url;
+      }
+    } catch (e) {
+      avatarUrl = '';
+    }
     const card = document.createElement('div');
     card.className = 'card';
     card.innerHTML = `
-      <h3>${org.name}</h3>
-      <button class="view-org-btn">View Organization Repos</button>
+      <div class="left-side">
+        <img src="${avatarUrl}" alt="${org.name}" style="width: 50px; height: 50px; border-radius: 4px;">
+        <h3>${org.name}</h3>
+      </div>
+      <button class="view-org-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16">
+          <path d="M21.71,20.29,18,16.61A9,9,0,1,0,16.61,18l3.68,3.68a1,1,0,0,0,1.42,0A1,1,0,0,0,21.71,20.29ZM11,18a7,7,0,1,1,7-7A7,7,0,0,1,11,18Z"></path>
+        </svg>
+      </button>
     `;
     
     // Add click handler for the button
@@ -336,7 +362,7 @@ function displayOrgs() {
     });
     
     orgsList.appendChild(card);
-  });
+  }
 }
 
 function initBrowserTabs() {
@@ -366,10 +392,232 @@ function initBrowserTabs() {
   });
 }
 
+// GitHub user search functionality
+async function searchGitHubUsers(query) {
+  try {
+    const response = await fetch(`https://api.github.com/search/users?q=${query}`);
+    if (!response.ok) throw new Error('Failed to fetch users');
+    return await response.json();
+  } catch (error) {
+    console.error('Error searching users:', error);
+    return { items: [] };
+  }
+}
+
+async function fetchUserProfile(username) {
+  try {
+    const [userResponse, reposResponse, orgsResponse] = await Promise.all([
+      fetch(`https://api.github.com/users/${username}`),
+      fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`),
+      fetch(`https://api.github.com/users/${username}/orgs`)
+    ]);
+
+    if (!userResponse.ok) throw new Error('Failed to fetch user profile');
+    
+    const userData = await userResponse.json();
+    const repos = await reposResponse.json();
+    const orgs = await orgsResponse.json();
+
+    return { userData, repos, orgs };
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    throw error;
+  }
+}
+
+// Keep track of current user's repos and orgs for search
+let currentUserRepos = [];
+let currentUserOrgs = [];
+
+function displayUserProfile(userData, repos, orgs) {
+  // Store repos and orgs for search functionality
+  currentUserRepos = repos;
+  currentUserOrgs = orgs;
+  const userProfile = document.getElementById('user-profile');
+  const searchResults = document.getElementById('search-results');
+  const userHeader = document.querySelector('.user-header');
+
+  // Hide search results and show profile
+  searchResults.style.display = 'none';
+  userProfile.style.display = 'block';
+
+  // Update profile header
+  userHeader.innerHTML = `
+    <img src="${userData.avatar_url}" alt="${userData.login}" class="user-avatar">
+    <div class="user-info">
+      <h2>${userData.name || userData.login}</h2>
+      <p>${userData.bio || ''}</p>
+      <div class="user-stats">
+        <div class="stat">
+          <span class="stat-value">${userData.public_repos}</span>
+          <span class="stat-label">Repositories</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">${userData.followers}</span>
+          <span class="stat-label">Followers</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">${userData.following}</span>
+          <span class="stat-label">Following</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Display repos
+  const userRepos = document.getElementById('user-repos');
+  userRepos.innerHTML = '';
+  repos.forEach(repo => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <h3>${repo.name}</h3>
+      <p>${repo.description || 'No description provided.'}</p>
+      <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    `;
+    userRepos.appendChild(card);
+  });
+
+  // Display orgs
+  const userOrgs = document.getElementById('user-orgs');
+  userOrgs.innerHTML = '';
+  orgs.forEach(org => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${org.avatar_url}" alt="${org.login}" style="width: 50px; height: 50px; border-radius: 4px;">
+      <div class="org-info">
+        <h3>${org.login}</h3>
+        <a href="https://github.com/${org.login}" target="_blank" rel="noopener noreferrer">View Organization</a>
+      </div>
+    `;
+    userOrgs.appendChild(card);
+  });
+}
+
+function initUserSearch() {
+  const searchInput = document.getElementById('github-user-search');
+  const searchResults = document.getElementById('search-results');
+  const userProfile = document.getElementById('user-profile');
+  const tabs = document.querySelectorAll('.tab');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  let searchTimeout;
+
+  searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    const query = e.target.value.trim();
+
+    if (query.length < 2) {
+      searchResults.innerHTML = '';
+      return;
+    }
+
+    // Show search results and hide profile
+    searchResults.style.display = 'grid';
+    userProfile.style.display = 'none';
+
+    searchTimeout = setTimeout(async () => {
+      const { items } = await searchGitHubUsers(query);
+      
+    searchResults.innerHTML = items.length ? '' : '<p>No users found matching your search.</p>';
+    items.forEach(user => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${user.avatar_url}" alt="${user.login}" style="width: 50px; height: 50px; border-radius: 50%;">
+          <h3>${user.login}</h3>
+          <button class="view-profile-btn">View Profile</button>
+        `;
+
+        card.querySelector('.view-profile-btn').addEventListener('click', async () => {
+          try {
+            const { userData, repos, orgs } = await fetchUserProfile(user.login);
+            displayUserProfile(userData, repos, orgs);
+          } catch (error) {
+            searchResults.innerHTML = `<p>Error loading profile: ${error.message}</p>`;
+          }
+        });
+
+        searchResults.appendChild(card);
+      });
+    }, 300);
+  });
+
+  // Tab switching functionality
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tabContents.forEach(content => content.classList.remove('active'));
+      
+      tab.classList.add('active');
+      const tabContent = document.getElementById(`user-${tab.dataset.tab}`);
+      if (tabContent) tabContent.classList.add('active');
+    });
+  });
+}
+
+function initSearch() {
+  const searchInput = document.getElementById('repo-search');
+  
+  searchInput.addEventListener('input', (e) => {
+    const activeTab = document.querySelector('.browser-tab.active');
+    const activeView = document.querySelector('.browser-view.active');
+    const query = e.target.value;
+    
+    if (!activeTab || !activeView) return;
+
+    // Clear any existing search timeout
+    if (window.searchTimeout) {
+      clearTimeout(window.searchTimeout);
+    }
+
+    // Add debouncing to prevent too many searches
+    window.searchTimeout = setTimeout(() => {
+      switch (activeTab.dataset.view) {
+        case 'personal':
+          if (!currentSelectedLanguage) return;
+          const languageRepos = allRepos.filter(repo => (repo.language || 'Unknown') === currentSelectedLanguage);
+          searchRepos(query, languageRepos, projectsList);
+          break;
+        
+        case 'organizations':
+          // If viewing an organization's repos
+          const orgView = activeView.querySelector('.card-container');
+          if (orgView) {
+            const orgRepos = Array.from(orgView.querySelectorAll('.card')).map(card => ({
+              name: card.querySelector('h3').textContent,
+              description: card.querySelector('p').textContent,
+              html_url: card.querySelector('a').href
+            }));
+            searchRepos(query, orgRepos, orgView);
+          }
+          break;
+        
+        case 'user-search':
+          // If viewing a user's profile
+          if (document.getElementById('user-profile').style.display === 'block') {
+            const activeProfileTab = document.querySelector('.tabs .tab.active');
+            if (activeProfileTab) {
+              if (activeProfileTab.dataset.tab === 'repos') {
+                searchRepos(query, currentUserRepos, document.getElementById('user-repos'));
+              } else if (activeProfileTab.dataset.tab === 'orgs') {
+                searchRepos(query, currentUserOrgs, document.getElementById('user-orgs'));
+              }
+            }
+          }
+          break;
+      }
+    }, 300); // 300ms debounce delay
+  });
+}
+
 function init() {
   fetchUserRepos();
   displayOrgs();
   initBrowserTabs();
+  initUserSearch();
+  initSearch();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -378,13 +626,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const themeButtons = document.querySelectorAll('.theme-btn');
 
   function applyTheme(theme) {
-    document.body.classList.remove('pink-theme', 'dark-theme', 'light-theme');
+    document.body.classList.remove('dark-theme', 'light-theme');
     if (theme === 'dark') {
       document.body.classList.add('dark-theme');
     } else if (theme === 'light') {
       document.body.classList.add('light-theme');
     } else {
-      document.body.classList.remove('pink-theme', 'dark-theme', 'light-theme');
+      document.body.classList.remove('dark-theme', 'light-theme');
       document.body.style.removeProperty('--primary-color');
       document.body.style.removeProperty('--secondary-color');
       document.body.style.removeProperty('--tertiary-color');

@@ -22,10 +22,10 @@ A dynamic, responsive portfolio website that showcases GitHub repositories and o
   - Real-time repository search functionality
 
 - **Modern UI/UX**
-  - VSCode-inspired layout
   - Responsive design for all devices
   - Smooth animations and transitions
   - Card-based project display
+  - Browser-like tabs
 
 - **Theme Customization**
   - Default theme (Purple gradient)
@@ -33,9 +33,8 @@ A dynamic, responsive portfolio website that showcases GitHub repositories and o
   - Light mode (Clean and bright)
 
 ## Technologies Used
-
 - HTML5
-- CSS3 (Custom properties, Flexbox, Grid)
+- CSS
 - Vanilla JavaScript
 - GitHub REST API
 - SVG Icons
@@ -48,6 +47,8 @@ git clone https://github.com/JayNightmare/New-Port.git
 ```
 
 2. Open `index.html` in your web browser
+3. Change the `username` in script.js to your username
+4. Change/Remove orgs in script.js to your orgs
 
 ## Usage
 
