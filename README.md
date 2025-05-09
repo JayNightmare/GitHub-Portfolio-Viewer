@@ -1,8 +1,17 @@
-# JayNightmare Portfolio
 
-A dynamic, responsive portfolio website that showcases GitHub repositories and organizations with a sleek VSCode-inspired interface.
+<div align="center">
+
+# GitHub Portfolio Viewer
+
+</div>
+
+A dynamic, responsive portfolio website that showcases GitHub repositories and organizations with a sleek design.
+
+<div align="center">
 
 ![Portfolio Preview](images/preview.png)
+
+</div>
 
 ## Features
 
