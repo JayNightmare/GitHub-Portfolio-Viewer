@@ -195,7 +195,8 @@ footer {
   color: var(--text-color);
   -webkit-user-select: none;
   user-select: none;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
 }
 
 #folder-list li:hover,
@@ -205,8 +206,8 @@ footer {
 
 #folder-list li.selected,
 .folder-list li.selected {
-  background-color: var(--primary-color);
-  color: var(--background-gradient-start);
+  border: 1px solid var(--primary-color);
+  transition: all 0.3s ease;
 }
 
 /* Responsive styles */
@@ -270,9 +271,24 @@ footer {
 
 .folder-icon {
   margin-right: 0.75rem;
-  font-size: 1.2rem;
   -webkit-user-select: none;
   user-select: none;
+  display: flex;
+  align-items: center;
+}
+
+.folder-svg {
+  transition: transform 0.3s ease;
+  color: var(--text-color);
+}
+
+.folder-svg path {
+  transition: d 0.3s ease;
+}
+
+li.selected .folder-svg {
+  transform: scale(1.1);
+  color: var(--primary-color);
 }
 
 #main-content,

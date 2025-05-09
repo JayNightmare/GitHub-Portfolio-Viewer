@@ -61,10 +61,26 @@ function groupReposByLanguage(repos) {
   return groups;
 }
 
+// SVG icons for folder states
+const FOLDER_ICONS = {
+  closed: `<svg class="folder-svg" width="20" height="20" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M4 4C2.89543 4 2 4.89543 2 6V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V8C22 6.89543 21.1046 6 20 6H12L10 4H4Z"/>
+  </svg>`,
+  open: `<svg class="folder-svg" width="20" height="20" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M2 6C2 4.89543 2.89543 4 4 4H10L12 6H20C21.1046 6 22 6.89543 22 8V18C22 19.1046 21.1046 20 20 20H4C2.89543 20 2 19.1046 2 18V6ZM4 6V18H20V8H11.1716L9.17157 6H4Z"/>
+  </svg>`
+};
+
 function highlightSelectedFolder(li) {
   if (!li) return;
-  folderList.querySelectorAll('li').forEach(item => item.classList.remove('selected'));
+  folderList.querySelectorAll('li').forEach(item => {
+    item.classList.remove('selected');
+    const icon = item.querySelector('.folder-icon');
+    if (icon) icon.innerHTML = FOLDER_ICONS.closed;
+  });
   li.classList.add('selected');
+  const selectedIcon = li.querySelector('.folder-icon');
+  if (selectedIcon) selectedIcon.innerHTML = FOLDER_ICONS.open;
 }
 
 // Render repos for selected language in main content
@@ -97,7 +113,7 @@ function renderFolderList(languages) {
 
     const icon = document.createElement('span');
     icon.className = 'folder-icon';
-    icon.textContent = '📁';
+    icon.innerHTML = FOLDER_ICONS.closed;
     li.prepend(icon);
 
     li.addEventListener('click', () => {
@@ -226,8 +242,14 @@ async function displayOrgRepos(orgName) {
 
     li.addEventListener('click', () => {
       // Update selected state
-      folderList.querySelectorAll('li').forEach(item => item.classList.remove('selected'));
+      folderList.querySelectorAll('li').forEach(item => {
+        item.classList.remove('selected');
+      const icon = item.querySelector('.folder-icon');
+      if (icon) icon.innerHTML = FOLDER_ICONS.closed;
+      });
       li.classList.add('selected');
+      const selectedIcon = li.querySelector('.folder-icon');
+    if (selectedIcon) selectedIcon.innerHTML = FOLDER_ICONS.open;
 
       // Render repos for selected language
       const reposContainer = view.querySelector('.card-container');
