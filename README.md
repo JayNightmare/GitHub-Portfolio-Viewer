@@ -1,4 +1,3 @@
-
 <div align="center">
 
 # GitHub Portfolio Viewer
@@ -56,7 +55,7 @@ git clone https://github.com/JayNightmare/New-Port.git
 - **Search**: Use the search bar to filter projects by name or description
 - **Theme Selection**: Toggle between themes using the buttons in the top-right corner
 - **View Projects**: Click on project cards to visit their GitHub repositories
-- **Organizations**: View and access organizations at the bottom of the page
+- **Organizations**: View and access organizations on the Organization Tab
 
 ## Responsive Design
 

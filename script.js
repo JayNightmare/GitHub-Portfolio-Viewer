@@ -81,8 +81,7 @@ const updateFeaturedProjects = () => {
     }
     
     featuredRepos.push(...allRepos
-      .sort((a, b) => b.stargazers_count - a.stargazers_count)
-      .slice(0, 3));
+      .sort((a, b) => b.stargazers_count - a.stargazers_count));
   }
 
   // Update navigation buttons state

@@ -567,7 +567,7 @@ footer {
   border: 1px solid var(--primary-color);
   z-index: 1;
   /* box-shadow: 0 0 20px var(--card-hover-shadow); */
-  overflow: hidden;
+  overflow-x: hidden;
   flex-wrap: nowrap;
 }
 
@@ -651,6 +651,11 @@ footer {
     padding: 0.5rem 1rem;
     overflow-x: auto;
     flex-shrink: 0;
+    width: 100%;
+  }
+
+  .content-container {
+    flex-direction: column !important;
     width: 100%;
   }
 
