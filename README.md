@@ -8,7 +8,7 @@ A dynamic, responsive portfolio website that showcases GitHub repositories and o
 
 <div align="center">
 
-![Portfolio Preview](images/preview.png)
+![Portfolio Preview](./doc/images/preview.png)
 
 </div>
 
