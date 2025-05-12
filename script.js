@@ -1,13 +1,136 @@
+// Store pinned repositories in localStorage
+let pinnedRepos = JSON.parse(localStorage.getItem('pinnedRepos') || '[]');
+
 // Helper function to render repository cards
-const renderRepoCard = (repo, container) => {
+const renderRepoCard = (repo, container, showPinButton = true) => {
+  const isPinned = pinnedRepos.includes(repo.name);
   const card = document.createElement('div');
-  card.className = 'card';
+  card.className = `card ${isPinned ? 'pinned' : ''}`;
+  
+  // Get repository topics and languages for tech tags
+  const techTags = [repo.language].filter(Boolean);
+  if (repo.topics) techTags.push(...repo.topics);
+  
   card.innerHTML = `
+    ${showPinButton ? `
+      <button class="pin-btn ${isPinned ? 'pinned' : ''}" title="${isPinned ? 'Unpin' : 'Pin'} repository">
+        <svg viewBox="0 0 24 24" width="16" height="16">
+          <path fill="currentColor" d="M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12Z" />
+        </svg>
+      </button>
+    ` : ''}
     <h3>${repo.name}</h3>
     <p>${repo.description || 'No description provided.'}</p>
+    <div class="tech-tags">
+      ${techTags.map(tag => `<span class="tech-tag">${tag}</span>`).join('')}
+    </div>
     <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    ${repo.homepage ? `<a href="${repo.homepage}" target="_blank" rel="noopener noreferrer">Live Demo</a>` : ''}
   `;
+
+  // Add pin button functionality
+  if (showPinButton) {
+    const pinBtn = card.querySelector('.pin-btn');
+    pinBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      if (isPinned) {
+        pinnedRepos = pinnedRepos.filter(name => name !== repo.name);
+        pinBtn.classList.remove('pinned');
+        pinBtn.title = 'Pin repository';
+      } else {
+        pinnedRepos.push(repo.name);
+        pinBtn.classList.add('pinned');
+        pinBtn.title = 'Unpin repository';
+      }
+      
+      localStorage.setItem('pinnedRepos', JSON.stringify(pinnedRepos));
+      updateFeaturedProjects(); // Refresh featured projects carousel
+    });
+  }
+
   container.appendChild(card);
+};
+
+// Function to update featured projects carousel
+const updateFeaturedProjects = () => {
+  const carouselTrack = document.querySelector('.carousel-track');
+  const prevBtn = document.querySelector('.carousel-btn.prev');
+  const nextBtn = document.querySelector('.carousel-btn.next');
+  
+  if (!carouselTrack || !allRepos) return;
+
+  carouselTrack.innerHTML = '';
+  
+  // Filter pinned repositories
+  const featuredRepos = allRepos.filter(repo => pinnedRepos.includes(repo.name));
+  
+  // If no pinned repos, show most starred repos
+  if (featuredRepos.length === 0) {
+    if (allRepos.length === 0) {
+      carouselTrack.innerHTML = `
+        <div class="empty-state">
+          <p>No repositories found</p>
+          <p class="suggestion">Pin your favorite repositories to see them here!</p>
+        </div>
+      `;
+      if (prevBtn) prevBtn.disabled = true;
+      if (nextBtn) nextBtn.disabled = true;
+      return;
+    }
+    
+    featuredRepos.push(...allRepos
+      .sort((a, b) => b.stargazers_count - a.stargazers_count)
+      .slice(0, 3));
+  }
+
+  // Update navigation buttons state
+  if (prevBtn) prevBtn.disabled = false;
+  if (nextBtn) nextBtn.disabled = featuredRepos.length <= 3;
+
+  featuredRepos.forEach(repo => {
+    const card = document.createElement('div');
+    card.className = 'featured-card';
+    
+    // Try to get a screenshot from the repo (you might want to store these URLs somewhere)
+    const screenshotUrl = `./images/projects/${repo.name}.png`;
+    
+    card.innerHTML = `
+      <img src="${screenshotUrl}" alt="${repo.name}" onerror="this.src='./images/preview.png'">
+      <div class="featured-card-content">
+        <h3>${repo.name}</h3>
+        <p>${repo.description || 'No description provided.'}</p>
+        <div class="tech-tags">
+          ${repo.language ? `<span class="tech-tag">${repo.language}</span>` : ''}
+          ${repo.topics ? repo.topics.map(topic => `<span class="tech-tag">${topic}</span>`).join('') : ''}
+        </div>
+        <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+        ${repo.homepage ? `<a href="${repo.homepage}" target="_blank" rel="noopener noreferrer">Live Demo</a>` : ''}
+      </div>
+    `;
+    
+    carouselTrack.appendChild(card);
+  });
+};
+
+// Carousel navigation
+const initCarousel = () => {
+  const track = document.querySelector('.carousel-track');
+  const prevBtn = document.querySelector('.carousel-btn.prev');
+  const nextBtn = document.querySelector('.carousel-btn.next');
+  
+  if (!track || !prevBtn || !nextBtn) return;
+
+  const scrollAmount = 320; // card width + gap
+
+  prevBtn.addEventListener('click', () => {
+    track.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    track.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  });
 };
 
 const username = 'JayNightmare';
@@ -137,14 +260,230 @@ function renderFolderList(languages) {
 
 let groupedRepos = {};
 
-async function fetchUserRepos() {
+// Project Detail Modal
+const createProjectModal = () => {
+  // Remove existing modal if it exists
+  const existingModal = document.getElementById('project-modal');
+  if (existingModal) {
+    existingModal.remove();
+  }
+
+  const modal = document.createElement('div');
+  modal.id = 'project-modal';
+  modal.className = 'project-modal';
+  modal.innerHTML = `
+    <div class="modal-content">
+      <button class="modal-close" aria-label="Close modal">&times;</button>
+      <div class="modal-body">
+        <!-- Content will be dynamically inserted here -->
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+
+  // Add event listeners
+  const closeBtn = modal.querySelector('.modal-close');
+  const closeModal = () => {
+    modal.classList.add('fade-out');
+    setTimeout(() => {
+      modal.style.display = 'none';
+      modal.classList.remove('fade-out');
+    }, 300);
+  };
+
+  closeBtn.addEventListener('click', closeModal);
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      closeModal();
+    }
+  });
+
+  // Add keyboard navigation
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.style.display === 'block') {
+      closeModal();
+    }
+  });
+
+  return modal;
+};
+
+// Initialize modal on page load
+document.addEventListener('DOMContentLoaded', () => {
+  createProjectModal();
+});
+
+const renderModalContent = (repo, readmeContent, recentCommits, openIssues) => {
+  return `
+    <div class="modal-header">
+      <h2>${repo.name}</h2>
+      <div class="repo-stats">
+        <span title="Stars">⭐ ${repo.stargazers_count}</span>
+        <span title="Forks">🔄 ${repo.forks_count}</span>
+        <span title="Watchers">👀 ${repo.watchers_count}</span>
+      </div>
+    </div>
+    <div class="repo-details">
+      <p>${repo.description || 'No description provided.'}</p>
+      <div class="repo-meta">
+        <span>Language: ${repo.language || 'Not specified'}</span>
+        <span>Updated: ${new Date(repo.updated_at).toLocaleDateString()}</span>
+        <span>Created: ${new Date(repo.created_at).toLocaleDateString()}</span>
+      </div>
+      <div class="repo-links">
+        <a href="${repo.html_url}" target="_blank" rel="noopener noreferrer" class="repo-link">
+          View on GitHub
+        </a>
+        ${repo.homepage ? `
+          <a href="${repo.homepage}" target="_blank" rel="noopener noreferrer" class="repo-link">
+            Visit Homepage
+          </a>
+        ` : ''}
+      </div>
+    </div>
+    ${readmeContent ? `
+      <div class="readme-section">
+        <h3>README</h3>
+        <div class="readme-content">${marked.parse(readmeContent)}</div>
+      </div>
+    ` : ''}
+    ${recentCommits.length ? `
+      <div class="commits-section">
+        <h3>Recent Commits</h3>
+        <ul class="commits-list">
+          ${recentCommits.map(commit => `
+            <li>
+              <strong>${commit.commit.message.split('\n')[0]}</strong>
+              <div class="commit-meta">
+                <span>by ${commit.commit.author.name}</span>
+                <span>${new Date(commit.commit.author.date).toLocaleDateString()}</span>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    ${openIssues.length ? `
+      <div class="issues-section">
+        <h3>Open Issues (${openIssues.length})</h3>
+        <ul class="issues-list">
+          ${openIssues.slice(0, 5).map(issue => `
+            <li>
+              <a href="${issue.html_url}" target="_blank" rel="noopener noreferrer">
+                ${issue.title}
+              </a>
+              <div class="issue-meta">
+                <span>#${issue.number}</span>
+                <span>opened ${new Date(issue.created_at).toLocaleDateString()}</span>
+              </div>
+            </li>
+          `).join('')}
+        </ul>
+        ${openIssues.length > 5 ? `
+          <a href="${repo.html_url}/issues" target="_blank" rel="noopener noreferrer" class="view-all-link">
+            View all ${openIssues.length} issues
+          </a>
+        ` : ''}
+      </div>
+    ` : ''}
+  `;
+};
+
+const showProjectDetails = async (repo) => {
+  const modal = document.getElementById('project-modal') || createProjectModal();
+  const modalBody = modal.querySelector('.modal-body');
+
+  // Show loading state with progress indicators
+  modalBody.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading project details...</p>
+      <div class="loading-progress">
+        <div>Fetching README...</div>
+        <div>Loading commit history...</div>
+        <div>Checking issues...</div>
+      </div>
+    </div>
+  `;
+  modal.style.display = 'block';
+
   try {
-    const response = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
-    if (!response.ok) throw new Error('Failed to fetch repositories');
-    const repos = await response.json();
+    // Fetch all data in parallel with error handling for each request
+    const [readme, commits, issues] = await Promise.allSettled([
+      fetchGitHubAPI(`/repos/${username}/${repo.name}/readme`)
+        .then(data => atob(data.content))
+        .catch(() => ''),
+      fetchGitHubAPI(`/repos/${username}/${repo.name}/commits?per_page=5`)
+        .catch(() => []),
+      fetchGitHubAPI(`/repos/${username}/${repo.name}/issues?state=open`)
+        .catch(() => [])
+    ]);
+
+    // Process results
+    const readmeContent = readme.status === 'fulfilled' ? readme.value : '';
+    const recentCommits = commits.status === 'fulfilled' ? commits.value : [];
+    const openIssues = issues.status === 'fulfilled' ? issues.value : [];
+
+    // Use the renderModalContent function to generate the HTML
+    modalBody.innerHTML = renderModalContent(repo, readmeContent, recentCommits, openIssues);
+  } catch (error) {
+    modalBody.innerHTML = `<p>Error loading project details: ${error.message}</p>`;
+  }
+};
+
+// GitHub API helper function
+const fetchGitHubAPI = async (endpoint) => {
+  try {
+    const response = await fetch(`https://api.github.com${endpoint}`);
+    const remaining = response.headers.get('X-RateLimit-Remaining');
+    const resetTime = response.headers.get('X-RateLimit-Reset');
+
+    if (remaining === '0') {
+      const resetDate = new Date(resetTime * 1000);
+      throw new Error(`API rate limit exceeded. Resets at ${resetDate.toLocaleTimeString()}`);
+    }
+
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error('Resource not found');
+      }
+      throw new Error(`GitHub API error: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('GitHub API Error:', error);
+    throw error;
+  }
+};
+
+async function fetchUserRepos() {
+  const projectsList = document.getElementById('projects-list');
+  projectsList.innerHTML = `
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading repositories...</p>
+    </div>
+  `;
+
+  try {
+    const repos = await fetchGitHubAPI(`/users/${username}/repos?sort=updated&per_page=100`);
+
+    if (repos.length === 0) {
+      projectsList.innerHTML = `
+        <div class="empty-state">
+          <p>No repositories found</p>
+          <p class="suggestion">Create your first repository to get started!</p>
+        </div>
+      `;
+      return;
+    }
 
     // Store all repos for search functionality
     allRepos = repos;
+
+    // Update featured projects first
+    updateFeaturedProjects();
 
     const groupedRepos = groupReposByLanguage(repos);
     const languages = Object.keys(groupedRepos).sort();
@@ -157,6 +496,32 @@ async function fetchUserRepos() {
       highlightSelectedFolder();
       renderReposForLanguage(currentSelectedLanguage);
     }
+
+    // Add click handlers for project details
+    const addProjectClickHandlers = () => {
+      document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.classList.contains('pin-btn') || e.target.closest('.pin-btn')) return;
+          const repoName = card.querySelector('h3').textContent;
+          const repo = allRepos.find(r => r.name === repoName);
+          if (repo) showProjectDetails(repo);
+        });
+      });
+    };
+
+    // Initial setup of click handlers
+    addProjectClickHandlers();
+
+    // Re-add click handlers after search or filter
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'childList') {
+          addProjectClickHandlers();
+        }
+      });
+    });
+
+    observer.observe(projectsList, { childList: true });
   } catch (error) {
     projectsList.innerHTML = `<p>Error loading projects: ${error.message}</p>`;
   }
@@ -694,6 +1059,14 @@ function init() {
   initBrowserTabs();
   initUserSearch();
   initSearch();
+  initCarousel();
+
+  // Initialize marked options for README rendering
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+    headerIds: false
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
