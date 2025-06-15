@@ -1,4 +1,4 @@
-import cache from '../state/cache.js';
+import cache from '../utils/cache.js';
 
 const API_BASE_URL = 'https://api.github.com';
 
