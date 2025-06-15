@@ -720,7 +720,7 @@ footer {
 }
 
 .folder-svg path {
-  transition: d 0.3s ease;
+  transition: fill 0.3s ease;
 }
 
 li.selected .folder-svg {
