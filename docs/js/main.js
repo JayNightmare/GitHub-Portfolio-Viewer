@@ -3,6 +3,7 @@ import { updateFeaturedProjects, initCarousel } from './components/carousel.js';
 import { renderFolderList, initTabSwitching, displayOrgRepos } from './components/tabs.js';
 import { initUserSearch, initRepoSearch } from './utils/search.js';
 import { initThemeManager } from './utils/theme.js';
+import { groupReposByLanguage } from './utils/group.js';
 import { createProjectModal, showProjectDetails } from './components/modal.js';
 import cache from './state/cache.js';
 
@@ -141,18 +142,6 @@ async function initRepos() {
   }
 }
 
-// Group repos by language
-function groupReposByLanguage(repos) {
-  const groups = {};
-  repos.forEach(repo => {
-    const lang = repo.language || 'Unknown';
-    if (!groups[lang]) {
-      groups[lang] = [];
-    }
-    groups[lang].push(repo);
-  });
-  return groups;
-}
 
 // Initialize the application
 function init() {

@@ -42,12 +42,15 @@ A dynamic, responsive portfolio website that showcases GitHub repositories and o
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/JayNightmare/New-Port.git
+git clone https://github.com/JayNightmare/GitHub-Portfolio-Viewer.git
 ```
-
-2. Open `index.html` in your web browser
-3. Change the `username` in script.js to your username
-4. Change/Remove orgs in script.js to your orgs
+2. Install dependencies and start the development server:
+```bash
+npm install
+npm start
+```
+3. Open `http://localhost:3000` in your web browser
+4. Customize the `username` and organizations inside `docs/js/main.js` if desired
 
 ## Usage
 
@@ -68,12 +71,12 @@ The portfolio is fully responsive and adapts to different screen sizes:
 
 To customize the portfolio for your own use:
 
-1. Update the GitHub username in `script.js`:
+1. Update the GitHub username in `docs/js/main.js`:
 ```javascript
 const username = 'YourGitHubUsername';
 ```
 
-2. Modify organizations in `script.js`:
+2. Modify organizations in `docs/js/main.js`:
 ```javascript
 const orgs = [
   { name: 'Your Org', url: 'https://github.com/Your-Org' },
