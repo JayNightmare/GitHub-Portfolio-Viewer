@@ -1,6 +1,7 @@
 import { renderRepoCard } from './carousel.js';
 import { fetchOrgRepos, fetchUserProfile } from '../api/github.js';
 import { showProjectDetails } from './modal.js';
+import { groupReposByLanguage } from '../utils/group.js';
 
 // SVG icons for folder states
 const FOLDER_ICONS = {
@@ -12,18 +13,6 @@ const FOLDER_ICONS = {
   </svg>`
 };
 
-// Group repos by language
-function groupReposByLanguage(repos) {
-  const groups = {};
-  repos.forEach(repo => {
-    const lang = repo.language || 'Unknown';
-    if (!groups[lang]) {
-      groups[lang] = [];
-    }
-    groups[lang].push(repo);
-  });
-  return groups;
-}
 
 function highlightSelectedFolder(li, folderList) {
   if (!li) return;
