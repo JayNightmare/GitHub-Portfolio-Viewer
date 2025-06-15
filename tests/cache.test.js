@@ -1,5 +1,5 @@
 import 'jest-localstorage-mock';
-import cache from '../docs/js/state/cache.js';
+import cache from '../react-app/src/utils/cache.js';
 
 describe('cache', () => {
   beforeEach(() => {
