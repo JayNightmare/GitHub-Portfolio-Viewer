@@ -44,10 +44,13 @@ A dynamic, responsive portfolio website that showcases GitHub repositories and o
 ```bash
 git clone https://github.com/JayNightmare/GitHub-Portfolio-Viewer.git
 ```
-
-2. Open `index.html` in your web browser
-3. Change the `username` in docs/js/main.js to your username
-4. Change/Remove orgs in docs/js/main.js to your orgs
+2. Install dependencies and start the development server:
+```bash
+npm install
+npm start
+```
+3. Open `http://localhost:3000` in your web browser
+4. Customize the `username` and organizations inside `docs/js/main.js` if desired
 
 ## Usage
 

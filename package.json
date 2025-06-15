@@ -4,7 +4,7 @@
   "description": "GitHub Portfolio Viewer",
   "main": "index.js",
   "scripts": {
-    "start": "http-server doc -p 3000 -c-1"
+    "start": "node node_modules/http-server/bin/http-server docs -p 3000 -c-1"
   },
   "dependencies": {
     "http-server": "^14.1.1"
