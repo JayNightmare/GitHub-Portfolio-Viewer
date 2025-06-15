@@ -61,7 +61,7 @@ class Cache {
   clearAll() {
     this.cache.clear();
     // Clear only our cache items from localStorage
-    for (let i = 0; i < localStorage.length; i++) {
+    for (let i = localStorage.length - 1; i >= 0; i--) {
       const key = localStorage.key(i);
       if (key.startsWith('cache_')) {
         localStorage.removeItem(key);
