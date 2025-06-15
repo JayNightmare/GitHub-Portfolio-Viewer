@@ -61,12 +61,14 @@ class Cache {
   clearAll() {
     this.cache.clear();
     // Clear only our cache items from localStorage
+    const toRemove = [];
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key.startsWith('cache_')) {
-        localStorage.removeItem(key);
+        toRemove.push(key);
       }
     }
+    toRemove.forEach(key => localStorage.removeItem(key));
   }
 }
 
